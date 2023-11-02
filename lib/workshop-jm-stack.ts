@@ -1,16 +1,22 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as cdk from "aws-cdk-lib";
+import * as s3 from "aws-cdk-lib/aws-s3";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import { Construct } from "constructs";
 
 export class WorkshopJmStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const myBucket = new s3.Bucket(this, "myBucket", {
+      bucketName: "workshop-cdk-typescript-jm",
+    });
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'WorkshopJmQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const myLambda = new lambda.Function(this, "myLambda", {
+      code: lambda.Code.fromAsset("./handler"),
+      handler: "lambda_function.lambda_handler",
+      runtime: lambda.Runtime.PYTHON_3_9,
+    });
+
+    myBucket.grantReadWrite(myLambda);
   }
 }
